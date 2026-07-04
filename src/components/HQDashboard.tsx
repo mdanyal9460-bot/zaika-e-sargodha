@@ -2,8 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useTracking, ArchivedOrder, User } from '@/context/TrackingContext';
-import { useRouter } from 'next/navigation';
-import { Shield, TrendingUp, Users, CheckCircle, XCircle, LogOut, Lock, Edit3, Save, Power, Clock } from 'lucide-react';
+import { Shield, TrendingUp, Users, LogOut, Lock, Edit3, Save, Power, Clock } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { useMenuData } from '@/hooks/useMenuData';
 import { MenuCategory, MenuItem } from '@/types/menu';
@@ -22,7 +21,7 @@ export default function HQDashboard() {
   const [adminPassword, setAdminPassword] = useState('');
   
   // Menu Editor State
-  const { menuData, loading, refetchMenu } = useMenuData();
+  const { menuData, refetchMenu } = useMenuData();
   const [localMenu, setLocalMenu] = useState<MenuCategory[]>([]);
   const [isSavingMenu, setIsSavingMenu] = useState(false);
   const [timeSlider, setTimeSlider] = useState(0);
@@ -44,15 +43,15 @@ export default function HQDashboard() {
     e.preventDefault();
     const isValid = await verifyAdminState(adminUsername, adminPassword);
     if (isValid) {
-      toast.success('Access Granted: Welcome to Mission Shadow 04 HQ');
+      toast.success('Access Granted: Welcome to Mission Shadow 04 HQ', { style: { background: '#1A1A1A', color: '#808080' }});
     } else {
-      toast.error('Access Denied: Invalid Master Password');
+      toast.error('Access Denied: Invalid Credentials', { style: { background: '#1A1A1A', color: '#808080' }});
     }
   };
 
   const handleLogout = () => {
-    toast.success('Admin Session Closed.');
-    window.location.href = '/'; // Forces a full refresh, which naturally clears isAdminVerified state since it's just React memory state.
+    toast.success('Admin Session Closed.', { style: { background: '#1A1A1A', color: '#808080' }});
+    window.location.href = '/'; 
   };
 
   const handleMenuChange = (categoryId: string, itemId: string, field: keyof MenuItem, value: string | number | boolean) => {
@@ -77,7 +76,7 @@ export default function HQDashboard() {
         body: JSON.stringify(localMenu)
       });
       if (res.ok) {
-        toast.success('Menu updated successfully on server');
+        toast.success('Menu updated successfully on server', { style: { background: '#1A1A1A', color: '#808080' }});
         refetchMenu();
       } else {
         toast.error('Failed to update menu');
@@ -92,9 +91,9 @@ export default function HQDashboard() {
   const toggleEmergencyShutdown = () => {
     setShopClosed(!isShopClosed);
     if (!isShopClosed) {
-      toast.error('EMERGENCY: Kitchen is now CLOSED globally.');
+      toast.error('EMERGENCY: Kitchen is now CLOSED globally.', { style: { background: '#1A1A1A', color: '#808080' }});
     } else {
-      toast.success('Kitchen is now OPEN.');
+      toast.success('Kitchen is now OPEN.', { style: { background: '#1A1A1A', color: '#808080' }});
     }
   };
 
@@ -103,21 +102,28 @@ export default function HQDashboard() {
     setAdminTimeOffset(val);
   };
 
-  // If not verified with the Master Password, show the lock screen
+  // Shadow Aura Theme Styles
+  const theme = {
+    bg: '#000000',
+    panelBg: '#1A1A1A',
+    text: '#808080',
+    border: '1px solid #333333',
+    inputBg: '#0a0a0a'
+  };
+
   if (!isAdminVerified) {
     return (
-      <div className="container" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div className="glassmorphism" style={{ padding: '40px', maxWidth: '400px', width: '100%', textAlign: 'center', borderRadius: 'var(--border-radius-lg)' }}>
-          <Shield size={64} style={{ color: 'var(--color-primary)', marginBottom: '20px' }} />
-          <h2 style={{ fontFamily: 'var(--font-playfair)', color: 'var(--color-primary)', marginBottom: '20px' }}>HQ Verification</h2>
-          <form onSubmit={handleAdminVerify}>
+      <div style={{ backgroundColor: theme.bg, color: theme.text, minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ backgroundColor: theme.panelBg, border: theme.border, padding: '40px', maxWidth: '400px', width: '100%', textAlign: 'center', borderRadius: '4px' }}>
+          <Shield size={64} style={{ color: theme.text, marginBottom: '20px' }} />
+          <h2 style={{ fontFamily: 'monospace', color: theme.text, marginBottom: '20px', letterSpacing: '2px' }}>HQ VERIFICATION</h2>
+          <form onSubmit={handleAdminVerify} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
             <input
               type="text"
               placeholder="Enter Access ID"
               value={adminUsername}
               onChange={(e) => setAdminUsername(e.target.value)}
-              className="form-input"
-              style={{ width: '100%', padding: '12px', marginBottom: '15px', borderRadius: 'var(--border-radius-sm)', border: '1px solid #ccc' }}
+              style={{ width: '100%', padding: '12px', borderRadius: '4px', border: theme.border, backgroundColor: theme.inputBg, color: theme.text, outline: 'none' }}
               autoFocus
             />
             <input
@@ -125,11 +131,10 @@ export default function HQDashboard() {
               placeholder="Enter Master Password"
               value={adminPassword}
               onChange={(e) => setAdminPassword(e.target.value)}
-              className="form-input"
-              style={{ width: '100%', padding: '12px', marginBottom: '20px', borderRadius: 'var(--border-radius-sm)', border: '1px solid #ccc' }}
+              style={{ width: '100%', padding: '12px', borderRadius: '4px', border: theme.border, backgroundColor: theme.inputBg, color: theme.text, outline: 'none' }}
             />
-            <button type="submit" className="btn-primary" style={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}>
-              <Lock size={18} /> Unlock Central Command
+            <button type="submit" style={{ width: '100%', padding: '12px', backgroundColor: theme.text, color: theme.bg, border: 'none', borderRadius: '4px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', transition: 'none' }}>
+              <Lock size={18} /> UNLOCK SYSTEM
             </button>
           </form>
         </div>
@@ -150,180 +155,182 @@ export default function HQDashboard() {
   })).sort((a, b) => b.totalSpent - a.totalSpent);
 
   return (
-    <div className="container" style={{ padding: '120px 20px 60px 20px', maxWidth: '1400px', margin: '0 auto' }}>
-      
-      {/* Header Section */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px', flexWrap: 'wrap', gap: '20px' }}>
-        <div>
-          <h1 style={{ fontFamily: 'var(--font-playfair)', color: 'var(--color-primary)', margin: '0 0 10px 0', fontSize: '2.5rem', display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <Shield size={36} /> Mission Shadow 04 HQ
-          </h1>
-          <p style={{ color: 'var(--color-text)', margin: 0, fontSize: '1.1rem', fontWeight: 'bold' }}>
-            Central Command Database & Analytics
-          </p>
-        </div>
-        <button onClick={handleLogout} className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <LogOut size={18} /> Logout
-        </button>
-      </div>
-
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '30px' }}>
+    <div style={{ backgroundColor: theme.bg, color: theme.text, minHeight: '100vh', padding: '60px 20px', fontFamily: 'monospace' }}>
+      <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
         
-        {/* Global Control Panel */}
-        <div className="glassmorphism" style={{ padding: '30px', borderRadius: 'var(--border-radius-lg)' }}>
-          <h2 style={{ fontFamily: 'var(--font-playfair)', color: 'var(--color-primary)', marginTop: 0, display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
-            <Power size={24} /> Mission Control
-          </h2>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '40px', alignItems: 'flex-start' }}>
-            
-            <div style={{ flex: '1 1 300px' }}>
-              <h3 style={{ fontSize: '1.2rem', marginBottom: '15px' }}>Emergency Protocol</h3>
-              <button 
-                onClick={toggleEmergencyShutdown}
-                style={{ 
-                  width: '100%', padding: '20px', borderRadius: '12px', border: 'none', cursor: 'pointer',
-                  background: isShopClosed ? '#28a745' : '#dc3545',
-                  color: 'white', fontSize: '1.2rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px',
-                  boxShadow: 'var(--shadow-soft)'
-                }}
-              >
-                <Power size={24} /> {isShopClosed ? 'OPEN KITCHEN' : 'EMERGENCY SHUTDOWN'}
-              </button>
-              <p style={{ marginTop: '10px', fontSize: '0.9rem', color: '#666' }}>
-                {isShopClosed ? 'Kitchen is currently CLOSED globally.' : 'Kitchen is currently OPEN.'}
-              </p>
-            </div>
-
-            <div style={{ flex: '1 1 300px', background: 'rgba(255,255,255,0.5)', padding: '20px', borderRadius: '12px' }}>
-              <h3 style={{ fontSize: '1.2rem', marginBottom: '15px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Clock size={20} /> Time Manipulation (Global ETA Offset)
-              </h3>
-              <input 
-                type="range" 
-                min="-30" max="60" step="5"
-                value={timeSlider}
-                onChange={(e) => handleTimeUpdate(parseInt(e.target.value))}
-                style={{ width: '100%' }}
-              />
-              <div style={{ textAlign: 'center', fontSize: '1.2rem', fontWeight: 'bold', marginTop: '10px', color: 'var(--color-primary)' }}>
-                {timeSlider > 0 ? `+${timeSlider}` : timeSlider} Minutes
-              </div>
-            </div>
-
+        {/* Header Section */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px', flexWrap: 'wrap', gap: '20px', borderBottom: theme.border, paddingBottom: '20px' }}>
+          <div>
+            <h1 style={{ margin: '0 0 5px 0', fontSize: '2rem', display: 'flex', alignItems: 'center', gap: '12px', letterSpacing: '2px', color: '#fff' }}>
+              <Shield size={28} /> MISSION SHADOW 04 HQ
+            </h1>
+            <p style={{ margin: 0, fontSize: '0.9rem', color: theme.text, textTransform: 'uppercase' }}>
+              Central Command Database & Analytics // SHADOW AURA ACTIVE
+            </p>
           </div>
+          <button onClick={handleLogout} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', backgroundColor: theme.panelBg, border: theme.border, color: theme.text, cursor: 'pointer' }}>
+            <LogOut size={16} /> TERMINATE SESSION
+          </button>
         </div>
 
-        {/* Dynamic Menu Editor */}
-        <div className="glassmorphism" style={{ padding: '30px', borderRadius: 'var(--border-radius-lg)' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '20px' }}>
-            <h2 style={{ fontFamily: 'var(--font-playfair)', color: 'var(--color-primary)', margin: 0, display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <Edit3 size={24} /> Master Menu Editor
-            </h2>
-            <button onClick={saveMenuToDisk} disabled={isSavingMenu} className="btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Save size={18} /> {isSavingMenu ? 'Saving to Disk...' : 'Save Changes to Disk'}
-            </button>
-          </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '30px' }}>
           
-          <div style={{ maxHeight: '600px', overflowY: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '800px' }}>
-              <thead>
-                <tr style={{ background: 'var(--color-primary)', color: 'white' }}>
-                  <th style={{ padding: '12px' }}>ID</th>
-                  <th style={{ padding: '12px' }}>Name</th>
-                  <th style={{ padding: '12px' }}>Price (Rs.)</th>
-                  <th style={{ padding: '12px' }}>Description</th>
-                  <th style={{ padding: '12px' }}>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {localMenu.flatMap(cat => cat.items.map(item => (
-                  <tr key={item.id} style={{ borderBottom: '1px solid rgba(0,0,0,0.1)', background: item.isActive ? 'transparent' : 'rgba(220,53,69,0.05)' }}>
-                    <td style={{ padding: '12px', fontSize: '0.9rem', color: '#666' }}>{item.id}</td>
-                    <td style={{ padding: '12px', fontWeight: 'bold' }}>{item.name}</td>
-                    <td style={{ padding: '12px' }}>
-                      <input 
-                        type="number" 
-                        value={item.price} 
-                        onChange={(e) => handleMenuChange(cat.categoryId, item.id, 'price', parseFloat(e.target.value))}
-                        style={{ width: '80px', padding: '6px', borderRadius: '4px', border: '1px solid #ccc' }}
-                      />
-                    </td>
-                    <td style={{ padding: '12px' }}>
-                      <input 
-                        type="text" 
-                        value={item.description || ''} 
-                        onChange={(e) => handleMenuChange(cat.categoryId, item.id, 'description', e.target.value)}
-                        style={{ width: '100%', minWidth: '200px', padding: '6px', borderRadius: '4px', border: '1px solid #ccc' }}
-                      />
-                    </td>
-                    <td style={{ padding: '12px' }}>
-                      <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', gap: '8px' }}>
-                        <input 
-                          type="checkbox" 
-                          checked={item.isActive} 
-                          onChange={(e) => handleMenuChange(cat.categoryId, item.id, 'isActive', e.target.checked)}
-                          style={{ width: '18px', height: '18px' }}
-                        />
-                        <span style={{ color: item.isActive ? '#28a745' : '#dc3545', fontWeight: 'bold' }}>
-                          {item.isActive ? 'Active' : 'Hidden'}
-                        </span>
-                      </label>
-                    </td>
-                  </tr>
-                )))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        {/* LTV & Global Ledger Components Restored */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '30px' }}>
-          {/* LTV Matrix */}
-          <div className="glassmorphism" style={{ padding: '30px', borderRadius: 'var(--border-radius-lg)' }}>
-            <h2 style={{ fontFamily: 'var(--font-playfair)', color: 'var(--color-primary)', marginTop: 0, display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
-              <Users size={24} /> LTV Matrix
+          {/* Global Control Panel */}
+          <div style={{ backgroundColor: theme.panelBg, border: theme.border, padding: '30px', borderRadius: '4px' }}>
+            <h2 style={{ marginTop: 0, display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px', fontSize: '1.2rem', color: '#fff', textTransform: 'uppercase' }}>
+              <Power size={20} /> Mission Control
             </h2>
-            <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '40px', alignItems: 'flex-start' }}>
+              
+              <div style={{ flex: '1 1 300px' }}>
+                <h3 style={{ fontSize: '1rem', marginBottom: '15px', color: theme.text }}>EMERGENCY PROTOCOL</h3>
+                <button 
+                  onClick={toggleEmergencyShutdown}
+                  style={{ 
+                    width: '100%', padding: '16px', border: theme.border, cursor: 'pointer',
+                    backgroundColor: isShopClosed ? theme.inputBg : theme.text,
+                    color: isShopClosed ? theme.text : theme.bg, 
+                    fontSize: '1rem', fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', textTransform: 'uppercase'
+                  }}
+                >
+                  <Power size={20} /> {isShopClosed ? 'OPEN KITCHEN' : 'EMERGENCY SHUTDOWN'}
+                </button>
+                <p style={{ marginTop: '10px', fontSize: '0.8rem', color: theme.text }}>
+                  STATUS: {isShopClosed ? 'CLOSED' : 'OPEN'}
+                </p>
+              </div>
+
+              <div style={{ flex: '1 1 300px', backgroundColor: theme.inputBg, border: theme.border, padding: '20px', borderRadius: '4px' }}>
+                <h3 style={{ fontSize: '1rem', marginBottom: '15px', display: 'flex', alignItems: 'center', gap: '8px', color: theme.text }}>
+                  <Clock size={16} /> TIME MANIPULATION (ETA OFFSET)
+                </h3>
+                <input 
+                  type="range" 
+                  min="-30" max="60" step="5"
+                  value={timeSlider}
+                  onChange={(e) => handleTimeUpdate(parseInt(e.target.value))}
+                  style={{ width: '100%', accentColor: theme.text }}
+                />
+                <div style={{ textAlign: 'center', fontSize: '1.2rem', fontWeight: 'bold', marginTop: '10px', color: '#fff' }}>
+                  {timeSlider > 0 ? `+${timeSlider}` : timeSlider} MIN
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          {/* Dynamic Menu Editor */}
+          <div style={{ backgroundColor: theme.panelBg, border: theme.border, padding: '30px', borderRadius: '4px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '20px' }}>
+              <h2 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '10px', fontSize: '1.2rem', color: '#fff', textTransform: 'uppercase' }}>
+                <Edit3 size={20} /> MASTER MENU EDITOR
+              </h2>
+              <button onClick={saveMenuToDisk} disabled={isSavingMenu} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', backgroundColor: theme.text, color: theme.bg, border: 'none', fontWeight: 'bold', cursor: 'pointer' }}>
+                <Save size={16} /> {isSavingMenu ? 'SAVING...' : 'COMMIT TO DISK'}
+              </button>
+            </div>
+            
+            <div style={{ maxHeight: '600px', overflowY: 'auto', border: theme.border }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '800px', fontSize: '0.9rem' }}>
                 <thead>
-                  <tr style={{ borderBottom: '2px solid rgba(0,0,0,0.1)', color: '#666', fontSize: '0.8rem' }}>
-                    <th style={{ padding: '8px' }}>Rank</th>
-                    <th style={{ padding: '8px' }}>Customer</th>
-                    <th style={{ padding: '8px' }}>LTV (Rs.)</th>
+                  <tr style={{ backgroundColor: theme.inputBg, color: theme.text, borderBottom: theme.border }}>
+                    <th style={{ padding: '12px' }}>ID</th>
+                    <th style={{ padding: '12px' }}>NAME</th>
+                    <th style={{ padding: '12px' }}>PRICE</th>
+                    <th style={{ padding: '12px' }}>DESCRIPTION</th>
+                    <th style={{ padding: '12px' }}>STATUS</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {ltvArray.map((customer, idx) => (
-                    <tr key={customer.customerId} style={{ borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
-                      <td style={{ padding: '8px', fontWeight: 'bold' }}>#{idx + 1}</td>
-                      <td style={{ padding: '8px' }}>{customer.customerId}</td>
-                      <td style={{ padding: '8px', color: 'var(--color-primary)', fontWeight: 'bold' }}>{customer.totalSpent.toLocaleString()}</td>
+                  {localMenu.flatMap(cat => cat.items.map(item => (
+                    <tr key={item.id} style={{ borderBottom: theme.border, backgroundColor: item.isActive ? 'transparent' : theme.inputBg }}>
+                      <td style={{ padding: '12px', color: '#555' }}>{item.id}</td>
+                      <td style={{ padding: '12px', color: '#fff' }}>{item.name}</td>
+                      <td style={{ padding: '12px' }}>
+                        <input 
+                          type="number" 
+                          value={item.price} 
+                          onChange={(e) => handleMenuChange(cat.categoryId, item.id, 'price', parseFloat(e.target.value))}
+                          style={{ width: '80px', padding: '6px', backgroundColor: theme.inputBg, color: theme.text, border: theme.border, outline: 'none' }}
+                        />
+                      </td>
+                      <td style={{ padding: '12px' }}>
+                        <input 
+                          type="text" 
+                          value={item.description || ''} 
+                          onChange={(e) => handleMenuChange(cat.categoryId, item.id, 'description', e.target.value)}
+                          style={{ width: '100%', minWidth: '200px', padding: '6px', backgroundColor: theme.inputBg, color: theme.text, border: theme.border, outline: 'none' }}
+                        />
+                      </td>
+                      <td style={{ padding: '12px' }}>
+                        <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', gap: '8px' }}>
+                          <input 
+                            type="checkbox" 
+                            checked={item.isActive} 
+                            onChange={(e) => handleMenuChange(cat.categoryId, item.id, 'isActive', e.target.checked)}
+                            style={{ width: '16px', height: '16px', accentColor: theme.text }}
+                          />
+                          <span style={{ color: item.isActive ? theme.text : '#555', fontWeight: 'bold' }}>
+                            {item.isActive ? 'ACTIVE' : 'HIDDEN'}
+                          </span>
+                        </label>
+                      </td>
                     </tr>
-                  ))}
+                  )))}
                 </tbody>
               </table>
             </div>
           </div>
 
-          {/* Ledger */}
-          <div className="glassmorphism" style={{ padding: '30px', borderRadius: 'var(--border-radius-lg)' }}>
-            <h2 style={{ fontFamily: 'var(--font-playfair)', color: 'var(--color-primary)', marginTop: 0, display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
-              <TrendingUp size={24} /> Global Order Ledger
-            </h2>
-            <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
-              {hqOrders.map(order => (
-                <div key={order.id} style={{ padding: '12px', borderBottom: '1px solid rgba(0,0,0,0.1)' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <strong>{order.id} ({order.customerId})</strong>
-                    <span style={{ color: order.finalStatus === 'Delivered' ? '#28a745' : '#dc3545' }}>{order.finalStatus}</span>
+          {/* LTV & Global Ledger Components */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '30px' }}>
+            {/* LTV Matrix */}
+            <div style={{ backgroundColor: theme.panelBg, border: theme.border, padding: '30px', borderRadius: '4px' }}>
+              <h2 style={{ marginTop: 0, display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px', fontSize: '1.2rem', color: '#fff', textTransform: 'uppercase' }}>
+                <Users size={20} /> LTV MATRIX
+              </h2>
+              <div style={{ maxHeight: '400px', overflowY: 'auto', border: theme.border }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.9rem' }}>
+                  <thead>
+                    <tr style={{ backgroundColor: theme.inputBg, borderBottom: theme.border, color: theme.text }}>
+                      <th style={{ padding: '12px' }}>RANK</th>
+                      <th style={{ padding: '12px' }}>CUSTOMER</th>
+                      <th style={{ padding: '12px' }}>LTV (Rs.)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {ltvArray.map((customer, idx) => (
+                      <tr key={customer.customerId} style={{ borderBottom: theme.border }}>
+                        <td style={{ padding: '12px', color: '#555' }}>#{idx + 1}</td>
+                        <td style={{ padding: '12px', color: '#fff' }}>{customer.customerId}</td>
+                        <td style={{ padding: '12px', color: theme.text, fontWeight: 'bold' }}>{customer.totalSpent.toLocaleString()}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Ledger */}
+            <div style={{ backgroundColor: theme.panelBg, border: theme.border, padding: '30px', borderRadius: '4px' }}>
+              <h2 style={{ marginTop: 0, display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px', fontSize: '1.2rem', color: '#fff', textTransform: 'uppercase' }}>
+                <TrendingUp size={20} /> GLOBAL ORDER LEDGER
+              </h2>
+              <div style={{ maxHeight: '400px', overflowY: 'auto', border: theme.border, backgroundColor: theme.inputBg }}>
+                {hqOrders.map(order => (
+                  <div key={order.id} style={{ padding: '12px', borderBottom: theme.border }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', color: '#fff' }}>
+                      <strong>{order.id} ({order.customerId})</strong>
+                      <span style={{ color: order.finalStatus === 'Delivered' ? theme.text : '#555' }}>{order.finalStatus}</span>
+                    </div>
+                    <div style={{ fontSize: '0.8rem', color: '#555', marginTop: '4px' }}>{new Date(order.placedAt).toLocaleString()} - Rs. {order.total}</div>
                   </div>
-                  <div style={{ fontSize: '0.8rem', color: '#666' }}>{new Date(order.placedAt).toLocaleString()} - Rs. {order.total}</div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
-        </div>
 
+        </div>
       </div>
     </div>
   );
