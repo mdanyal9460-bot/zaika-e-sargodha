@@ -5,9 +5,11 @@ import Image from 'next/image';
 import { useCart } from '@/context/CartContext';
 import { X, Plus, Minus, ShoppingBag } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTracking } from '@/context/TrackingContext';
 
 export default function CartSidebar() {
   const { cartItems, isCartOpen, toggleCart, updateQuantity, cartTotal } = useCart();
+  const { startTracking } = useTracking();
 
   return (
     <AnimatePresence>
@@ -75,6 +77,8 @@ export default function CartSidebar() {
                   className="btn-primary checkout-btn" 
                   style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}
                   onClick={() => {
+                    startTracking(cartItems, cartTotal);
+                    toggleCart();
                     import('@/utils/whatsapp').then(({ sendOrderToWhatsApp }) => {
                       sendOrderToWhatsApp(cartItems, cartTotal);
                     });

@@ -1,14 +1,17 @@
 import Image from "next/image";
+import { menuData } from '@/data/menuData';
 
 export default function Gallery() {
-  const images = [
-    { src: "/hero.png", alt: "Authentic Spread" },
-    { src: "/biryani.png", alt: "Chicken Biryani Close-up" },
-    { src: "/karahi.png", alt: "Chicken Karahi" },
-    { src: "/biryani.png", alt: "Food Packaging" },
-    { src: "/karahi.png", alt: "Fresh Ingredients" },
-    { src: "/hero.png", alt: "Family Deals" },
-  ];
+  const allItems = menuData.flatMap(category => category.items);
+  const featuredIds = ['mc-3', 'mc-9', 'des-1', 'mc-7', 'mc-1', 'dl-1'];
+  
+  const images = featuredIds.map(id => {
+    const item = allItems.find(i => i.id === id);
+    return {
+      src: item?.image || '/images/hero.png',
+      alt: item?.name || 'Zaika-e-Sargodha Specialty'
+    };
+  });
 
   return (
     <section className="section container">

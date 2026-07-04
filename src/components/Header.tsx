@@ -3,10 +3,13 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
+import { useTracking } from '@/context/TrackingContext';
+import { MapPin } from 'lucide-react';
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const { cartCount, toggleCart } = useCart();
+  const { toggleTracker, activeOrder } = useTracking();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -36,8 +39,16 @@ export default function Header() {
         </nav>
 
         <div className="header-actions">
+          {activeOrder && (
+            <button 
+              onClick={toggleTracker} 
+              className="btn-secondary" 
+              style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 12px', fontSize: '0.9rem' }}
+            >
+              <MapPin size={16} /> <span className="mobile-hidden">Track Order</span>
+            </button>
+          )}
           <a href="#" className="header-link">FoodPanda</a>
-          <a href="#" className="header-link">WhatsApp</a>
           <button onClick={toggleCart} className="cart-icon" style={{background:'none', border:'none', cursor:'pointer'}}>
             🛒
             {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
