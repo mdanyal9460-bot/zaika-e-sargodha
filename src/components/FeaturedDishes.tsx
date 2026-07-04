@@ -3,13 +3,18 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import ProductModal from '@/components/ProductModal';
-import { menuData } from '@/data/menuData';
+import { useMenuData } from '@/hooks/useMenuData';
+import { useTracking } from '@/context/TrackingContext';
 
 export default function FeaturedDishes() {
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
+  const { menuData, loading } = useMenuData();
+  const { isShopClosed } = useTracking();
 
-  // Flatten all items for easy searching
-  const allItems = menuData.flatMap(category => category.items);
+  if (loading) return null;
+
+  // Flatten all items and only include active ones
+  const allItems = menuData.flatMap(category => category.items).filter(item => item.isActive);
   
   // Extract the exact 6 premium items requested by Alpha
   const featuredDishes = [
@@ -48,10 +53,15 @@ export default function FeaturedDishes() {
                 <div className="dish-price">{dish.price}</div>
                 <button 
                   className="btn-primary" 
-                  style={{ width: '100%' }}
-                  onClick={() => setSelectedProduct(dish)}
+                  style={{ 
+                    width: '100%', 
+                    opacity: isShopClosed ? 0.5 : 1, 
+                    cursor: isShopClosed ? 'not-allowed' : 'pointer' 
+                  }}
+                  onClick={() => !isShopClosed && setSelectedProduct(dish)}
+                  disabled={isShopClosed}
                 >
-                  Order Options
+                  {isShopClosed ? 'Kitchen Closed' : 'Order Options'}
                 </button>
               </div>
             </div>

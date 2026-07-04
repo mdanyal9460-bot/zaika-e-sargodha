@@ -1,0 +1,73 @@
+[
+  {
+    "categoryId": "desserts",
+    "categoryName": "Desserts",
+    "items": [
+      { "id": "des-1", "name": "Special Sugi ka halwa", "price": 200, "image": "/images/sugi-halwa.jpg", "description": "Delicious traditional suji halwa made with pure ghee and dry fruits.", "isActive": true }
+    ]
+  },
+  {
+    "categoryId": "beverages",
+    "categoryName": "Beverages",
+    "items": [
+      { "id": "bev-1", "name": "Getway Premium Drinking Water - 300ml", "price": 100, "image": "/images/getway-water.jpg", "description": "Pure and refreshing premium drinking water.", "isActive": true }
+    ]
+  },
+  {
+    "categoryId": "main-course",
+    "categoryName": "Main Course",
+    "items": [
+      { "id": "mc-1", "name": "Homestyle Bhindi Chicken", "price": 399, "image": "/images/bhindi-chicken.jpg", "description": "Authentic homemade style bhindi cooked with tender chicken.", "isActive": true },
+      { "id": "mc-2", "name": "Special Karhi Pakora", "price": 290, "image": "/images/karhi-pakora.jpg", "description": "Traditional yogurt and gram flour curry with crispy pakoras.", "isActive": true },
+      { "id": "mc-3", "name": "Shahi Hyderabadi Biryani", "price": 370, "image": "/images/hyderabadi-biryani.jpg", "description": "Aromatic basmati rice cooked with tender chicken pieces and secret spices.", "isActive": true },
+      { "id": "mc-4", "name": "Desi Aloo Palak", "price": 199, "image": "/images/aloo-palak.jpg", "description": "Fresh spinach and potatoes cooked with traditional spices.", "isActive": true },
+      { "id": "mc-5", "name": "Chicken Korma", "price": 449, "image": "/images/chicken-korma.jpg", "description": "Rich, creamy chicken curry made with yogurt and premium spices.", "isActive": true },
+      { "id": "mc-6", "name": "Chicken Karela", "price": 399, "image": "/images/chicken-karela.jpg", "description": "Bitter gourd and chicken cooked to perfection.", "isActive": true },
+      { "id": "mc-7", "name": "Beef Korma", "price": 499, "image": "/images/beef-korma.jpg", "description": "Tender beef pieces in a rich, aromatic gravy.", "isActive": true },
+      { "id": "mc-8", "name": "Mung Masri Dal", "price": 299, "image": "/images/mung-masri-dal.jpg", "description": "Comforting blend of yellow and red lentils.", "isActive": true },
+      { "id": "mc-9", "name": "Chicken Karahi", "price": 499, "image": "/images/chicken-karahi.jpg", "description": "Street-style chicken cooked with tomatoes and green chilies.", "isActive": true },
+      { "id": "mc-10", "name": "Aloo Chicken Shorba", "price": 340, "image": "/images/aloo-chicken-shorba.jpg", "description": "Classic chicken and potato curry with a rich, flavorful broth.", "isActive": true },
+      { "id": "mc-11", "name": "Fried Dal Mash", "price": 299, "image": "/images/fried-dal-mash.jpg", "description": "Premium white lentils tempered with garlic and traditional spices.", "isActive": true },
+      { "id": "mc-12", "name": "Lahori White Chana", "price": 249, "image": "/images/lahori-white-chana.jpg", "description": "Authentic Lahori style chickpea curry.", "isActive": true },
+      { "id": "mc-13", "name": "Veg Thali", "price": 349, "image": "/images/veg-thali.jpg", "description": "Assortment of fresh seasonal vegetables and lentils.", "isActive": true },
+      { "id": "mc-14", "name": "Shami Burger", "price": 199, "image": "/images/shami-burger.jpg", "description": "Classic street-style burger with shami kabab and fresh salad.", "isActive": true }
+    ]
+  },
+  {
+    "categoryId": "paratha-and-rolls",
+    "categoryName": "Paratha and Rolls",
+    "items": [
+      { "id": "pr-1", "name": "Classic Aloo Paratha", "price": 180, "image": "/images/aloo-paratha.jpg", "description": "Crispy flatbread stuffed with spiced mashed potatoes.", "isActive": true },
+      { "id": "pr-2", "name": "Anda Paratha Roll", "price": 199, "image": "/images/anda-paratha-roll.jpg", "description": "Fresh paratha wrapped around a spicy fried egg.", "isActive": true },
+      { "id": "pr-3", "name": "Plain Tawa Paratha", "price": 69, "image": "/images/tawa-paratha.jpg", "description": "Freshly made crispy tawa paratha.", "isActive": true },
+      { "id": "pr-4", "name": "Aloo Chicken Paratha", "price": 199, "image": "/images/aloo-chicken-paratha.jpg", "description": "Crispy flatbread stuffed with spiced chicken and potatoes.", "isActive": true }
+    ]
+  },
+  {
+    "categoryId": "deals",
+    "categoryName": "Deals",
+    "items": [
+      { "id": "dl-1", "name": "Deal 1", "price": 99, "image": "/images/deal-1.jpg", "description": "Plain Paratha + Raita", "isActive": true },
+      { "id": "dl-2", "name": "Deal 2", "price": 199, "image": "/images/deal-2.jpg", "description": "Aloo Paratha + Raita", "isActive": true },
+      { "id": "dl-3", "name": "CHICKEN PARATHA COMBO", "price": 249, "image": "/images/chicken-paratha-combo.jpg", "description": "Aloo Chicken Paratha with Raita and a drink.", "isActive": true },
+      { "id": "dl-4", "name": "Biryani with Coke Combo", "price": 450, "image": "/images/biryani-coke-combo.jpg", "description": "Shahi Hyderabadi Biryani with a chilled Coke.", "isActive": true }
+    ]
+  },
+  {
+    "categoryId": "cutlery",
+    "categoryName": "Cutlery",
+    "items": [
+      { "id": "cut-1", "name": "Disposable Fork", "price": 10, "image": "/images/fork.jpg", "description": "Single-use disposable fork.", "isActive": true },
+      { "id": "cut-2", "name": "Disposable Spoon", "price": 10, "image": "/images/spoon.jpg", "description": "Single-use disposable spoon.", "isActive": true }
+    ]
+  },
+  {
+    "categoryId": "sides",
+    "categoryName": "Sides",
+    "items": [
+      { "id": "sd-1", "name": "Shami Kabab", "price": 80, "image": "/images/shami-kabab.jpg", "description": "Spiced lentil and meat patty.", "isActive": true },
+      { "id": "sd-2", "name": "Fresh Home Roti Foil Packed", "price": 30, "image": "/images/fresh-roti.jpg", "description": "Soft, freshly baked whole wheat flatbread.", "isActive": true },
+      { "id": "sd-3", "name": "Special Zeera Raita", "price": 29, "image": "/images/zeera-raita.jpg", "description": "Cool yogurt mixed with roasted cumin.", "isActive": true }
+    ]
+  }
+]

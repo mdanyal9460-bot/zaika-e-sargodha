@@ -1,14 +1,17 @@
 "use client";
 
-import React from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
-import { menuData } from '@/data/menuData';
+import { useMenuData } from '@/hooks/useMenuData';
+import { useTracking } from '@/context/TrackingContext';
 import { useCart } from '@/context/CartContext';
 import { toast } from 'react-hot-toast';
 import { Plus } from 'lucide-react';
 
 export default function Menu() {
   const { addToCart } = useCart();
+  const { menuData, loading } = useMenuData();
+  const { isShopClosed } = useTracking();
 
   const handleAddToOrder = (item: any) => {
     addToCart({
@@ -57,7 +60,7 @@ export default function Menu() {
             </h3>
             
             <div className="grid-3">
-              {category.items.map((item, idx) => (
+              {category.items.filter(item => item.isActive).map((item, idx) => (
                 <div key={item.id} className="card" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
                   <div style={{ position: 'relative', width: '100%', height: '200px' }}>
                     <Image 
@@ -67,19 +70,19 @@ export default function Menu() {
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                       priority={idx < 3} /* Priority for top row items */
                       style={{ objectFit: 'cover' }}
+                      className="dish-card-img"
                     />
                   </div>
                   <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', flexGrow: 1, justifyContent: 'space-between' }}>
                     <div>
                       <h4 style={{ fontSize: '1.25rem', marginBottom: '8px', color: 'var(--color-text)' }}>{item.name}</h4>
+                      {item.description && <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '15px' }}>{item.description}</p>}
                       <div style={{ color: '#B8860B', fontWeight: '700', fontSize: '1.2rem', marginBottom: '16px' }}>
                         Rs. {item.price}
                       </div>
                     </div>
-                    
                     <button 
-                      onClick={() => handleAddToOrder(item)}
-                      className="btn-primary"
+                      className="btn-primary" 
                       style={{ 
                         width: '100%', 
                         padding: '12px 20px', 
@@ -89,10 +92,14 @@ export default function Menu() {
                         gap: '8px',
                         fontSize: '1rem',
                         minHeight: '54px', /* Ensuring touch target meets guidelines */
-                        marginTop: 'auto'
+                        marginTop: 'auto',
+                        opacity: isShopClosed ? 0.5 : 1,
+                        cursor: isShopClosed ? 'not-allowed' : 'pointer'
                       }}
+                      onClick={() => !isShopClosed && handleAddToOrder(item)}
+                      disabled={isShopClosed}
                     >
-                      <Plus size={18} /> Add to Order
+                      {isShopClosed ? 'Kitchen Closed' : <><Plus size={18} /> Add to Order</>}
                     </button>
                   </div>
                 </div>

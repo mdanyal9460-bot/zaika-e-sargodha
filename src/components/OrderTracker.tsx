@@ -21,8 +21,13 @@ export default function OrderTracker() {
     clearTracking,
     timeOffsetMinutes,
     estimatedRemainingMinutes,
-    setAdminTimeOffset
+    setAdminTimeOffset,
+    adminIssueTempPassword,
+    currentUser
   } = useTracking();
+
+  const [targetId, setTargetId] = React.useState('');
+  const [tempPass, setTempPass] = React.useState('');
 
   const getCurrentStageIndex = () => {
     return STATUS_STAGES.findIndex(stage => stage.status === currentStatus);
@@ -154,7 +159,7 @@ export default function OrderTracker() {
                           import('react-hot-toast').then(({ toast }) => {
                             toast.error(`Order Cancelled. Dashboard Notified: ${reason || 'No reason provided'}`);
                           });
-                          clearTracking();
+                          clearTracking('Cancelled');
                         }
                       }}
                       disabled={currentStatus === 'Out for Delivery'}
@@ -175,7 +180,7 @@ export default function OrderTracker() {
 
                 {currentStatus === 'Delivered' && (
                   <button 
-                    onClick={clearTracking}
+                    onClick={() => clearTracking('Delivered')}
                     className="btn-secondary"
                     style={{ width: '100%', marginTop: '30px' }}
                   >
@@ -183,28 +188,65 @@ export default function OrderTracker() {
                   </button>
                 )}
 
-                {/* Admin Controls for Time Simulation */}
-                <div style={{ marginTop: '40px', paddingTop: '20px', borderTop: '1px solid #e0e0e0' }}>
-                  <div style={{ fontSize: '0.85rem', fontWeight: 'bold', color: '#333', marginBottom: '8px' }}>
-                    Admin Control (Time Adjustment)
+                {/* Admin Controls for Time Simulation & Auth Overrides */}
+                {currentUser?.role === 'admin' && (
+                  <div style={{ marginTop: '40px', paddingTop: '20px', borderTop: '1px solid #e0e0e0' }}>
+                    <div style={{ fontSize: '0.85rem', fontWeight: 'bold', color: '#333', marginBottom: '8px' }}>
+                      Admin Controls
+                    </div>
+                    
+                    {/* Time Simulator */}
+                    <div style={{ marginBottom: '20px' }}>
+                      <div style={{ fontSize: '0.75rem', color: '#666', marginBottom: '8px' }}>
+                        Simulate time passing (Offset: {timeOffsetMinutes} mins)
+                      </div>
+                      <input 
+                        type="range" 
+                        min="-10" 
+                        max="60" 
+                        step="5"
+                        value={timeOffsetMinutes}
+                        onChange={(e) => setAdminTimeOffset(Number(e.target.value))}
+                        style={{ width: '100%' }}
+                      />
+                    </div>
+
+                    {/* Issue Temp Password */}
+                    <div style={{ background: 'rgba(0,0,0,0.03)', padding: '12px', borderRadius: '8px' }}>
+                      <div style={{ fontSize: '0.75rem', color: '#666', marginBottom: '8px' }}>
+                        Issue Temporary Password
+                      </div>
+                      <input 
+                        type="text" 
+                        placeholder="Target Customer ID" 
+                        value={targetId}
+                        onChange={e => setTargetId(e.target.value)}
+                        style={{ width: '100%', marginBottom: '8px', padding: '6px', fontSize: '0.8rem' }} 
+                      />
+                      <input 
+                        type="text" 
+                        placeholder="Temp Password" 
+                        value={tempPass}
+                        onChange={e => setTempPass(e.target.value)}
+                        style={{ width: '100%', marginBottom: '8px', padding: '6px', fontSize: '0.8rem' }} 
+                      />
+                      <button 
+                        onClick={() => {
+                          if(targetId && tempPass) {
+                            adminIssueTempPassword(targetId, tempPass).then(() => {
+                              import('react-hot-toast').then(({ toast }) => toast.success(`Password updated for ${targetId}`));
+                              setTargetId('');
+                              setTempPass('');
+                            });
+                          }
+                        }}
+                        style={{ width: '100%', padding: '6px', background: '#333', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '0.8rem' }}
+                      >
+                        Force Update Password
+                      </button>
+                    </div>
                   </div>
-                  <div style={{ fontSize: '0.75rem', color: '#666', marginBottom: '12px' }}>
-                    Simulate time passing (Offset: {timeOffsetMinutes} mins)
-                  </div>
-                  <input 
-                    type="range" 
-                    min="-10" 
-                    max="60" 
-                    step="5"
-                    value={timeOffsetMinutes}
-                    onChange={(e) => setAdminTimeOffset(Number(e.target.value))}
-                    style={{ width: '100%' }}
-                  />
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: '#999', marginTop: '4px' }}>
-                    <span>Delay (-10m)</span>
-                    <span>Speed Up (+60m)</span>
-                  </div>
-                </div>
+                )}
               </div>
             )}
           </motion.div>

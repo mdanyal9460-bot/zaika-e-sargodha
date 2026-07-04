@@ -1,8 +1,14 @@
+"use client";
+
 import Image from "next/image";
-import { menuData } from '@/data/menuData';
+import { useMenuData } from '@/hooks/useMenuData';
 
 export default function Gallery() {
-  const allItems = menuData.flatMap(category => category.items);
+  const { menuData, loading } = useMenuData();
+  
+  if (loading) return null;
+  
+  const allItems = menuData.flatMap(category => category.items).filter(item => item.isActive);
   const featuredIds = ['mc-3', 'mc-9', 'des-1', 'mc-7', 'mc-1', 'dl-1'];
   
   const images = featuredIds.map(id => {

@@ -4,12 +4,12 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
 import { useTracking } from '@/context/TrackingContext';
-import { MapPin } from 'lucide-react';
+import { MapPin, User } from 'lucide-react';
 
 export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const { cartCount, toggleCart } = useCart();
-  const { toggleTracker, activeOrder } = useTracking();
+  const { toggleTracker, activeOrder, toggleAuthModal, currentUser, logoutCustomer } = useTracking();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -48,7 +48,31 @@ export default function Header() {
               <MapPin size={16} /> <span className="mobile-hidden">Track Order</span>
             </button>
           )}
-          <a href="#" className="header-link">FoodPanda</a>
+
+          {currentUser ? (
+            <Link 
+              href={currentUser.role === 'admin' ? '/hq' : '/dashboard'}
+              className="header-link"
+              style={{ display: 'flex', alignItems: 'center', gap: '6px', textDecoration: 'none', color: 'inherit' }}
+              title={`Logged in as ${currentUser.customerId}`}
+            >
+              <User size={18} />
+              <span className="mobile-hidden">
+                {currentUser.role === 'admin' ? 'HQ Dashboard' : 'Dashboard'}
+              </span>
+            </Link>
+          ) : (
+            <button 
+              onClick={toggleAuthModal}
+              className="header-link"
+              style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'inherit', color: 'inherit' }}
+              title="Login / Register"
+            >
+              <User size={18} />
+              <span className="mobile-hidden">Login</span>
+            </button>
+          )}
+
           <button onClick={toggleCart} className="cart-icon" style={{background:'none', border:'none', cursor:'pointer'}}>
             🛒
             {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}

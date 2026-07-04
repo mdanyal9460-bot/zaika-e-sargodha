@@ -19,6 +19,7 @@ import { CartProvider } from "@/context/CartContext";
 import { TrackingProvider } from "@/context/TrackingContext";
 import CartSidebar from "@/components/CartSidebar";
 import OrderTracker from "@/components/OrderTracker";
+import AuthModal from "@/components/AuthModal";
 import FloatingWhatsApp from "@/components/FloatingWhatsApp";
 import Footer from "@/components/Footer";
 import { Toaster } from "react-hot-toast";
@@ -41,6 +42,7 @@ export default function RootLayout({
             {children}
             <CartSidebar />
             <OrderTracker />
+            <AuthModal />
             <FloatingWhatsApp />
             <Footer />
             <Toaster position="bottom-center" />
