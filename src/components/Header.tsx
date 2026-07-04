@@ -51,15 +51,13 @@ export default function Header() {
 
           {currentUser ? (
             <Link 
-              href={currentUser.role === 'admin' ? '/hq' : '/dashboard'}
+              href="/dashboard"
               className="header-link"
               style={{ display: 'flex', alignItems: 'center', gap: '6px', textDecoration: 'none', color: 'inherit' }}
               title={`Logged in as ${currentUser.customerId}`}
             >
               <User size={18} />
-              <span className="mobile-hidden">
-                {currentUser.role === 'admin' ? 'HQ Dashboard' : 'Dashboard'}
-              </span>
+              <span className="mobile-hidden">Dashboard</span>
             </Link>
           ) : (
             <button 

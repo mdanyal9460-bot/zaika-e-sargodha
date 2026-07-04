@@ -10,15 +10,15 @@ import { MenuCategory, MenuItem } from '@/types/menu';
 
 export default function HQDashboard() {
   const { 
-    currentUser, logoutCustomer, getAllHQOrders, getAllUsers,
+    getAllHQOrders, getAllUsers,
     isAdminVerified, verifyAdminState,
     isShopClosed, setShopClosed,
     setAdminTimeOffset
   } = useTracking();
-  const router = useRouter();
   
   const [hqOrders, setHqOrders] = useState<ArchivedOrder[]>([]);
   const [users, setUsers] = useState<User[]>([]);
+  const [adminUsername, setAdminUsername] = useState('');
   const [adminPassword, setAdminPassword] = useState('');
   
   // Menu Editor State
@@ -28,13 +28,11 @@ export default function HQDashboard() {
   const [timeSlider, setTimeSlider] = useState(0);
 
   useEffect(() => {
-    if (!currentUser || currentUser.role !== 'admin') {
-      router.push('/');
-    } else {
+    if (isAdminVerified) {
       setHqOrders(getAllHQOrders());
       setUsers(getAllUsers());
     }
-  }, [currentUser, router]);
+  }, [isAdminVerified, getAllHQOrders, getAllUsers]);
 
   useEffect(() => {
     if (menuData.length > 0) {
@@ -42,11 +40,9 @@ export default function HQDashboard() {
     }
   }, [menuData]);
 
-  if (!currentUser || currentUser.role !== 'admin') return null;
-
   const handleAdminVerify = async (e: React.FormEvent) => {
     e.preventDefault();
-    const isValid = await verifyAdminState(adminPassword);
+    const isValid = await verifyAdminState(adminUsername, adminPassword);
     if (isValid) {
       toast.success('Access Granted: Welcome to Mission Shadow 04 HQ');
     } else {
@@ -55,9 +51,8 @@ export default function HQDashboard() {
   };
 
   const handleLogout = () => {
-    logoutCustomer();
-    toast.success('Admin logged out.');
-    router.push('/');
+    toast.success('Admin Session Closed.');
+    window.location.href = '/'; // Forces a full refresh, which naturally clears isAdminVerified state since it's just React memory state.
   };
 
   const handleMenuChange = (categoryId: string, itemId: string, field: keyof MenuItem, value: string | number | boolean) => {
@@ -117,13 +112,21 @@ export default function HQDashboard() {
           <h2 style={{ fontFamily: 'var(--font-playfair)', color: 'var(--color-primary)', marginBottom: '20px' }}>HQ Verification</h2>
           <form onSubmit={handleAdminVerify}>
             <input
+              type="text"
+              placeholder="Enter Access ID"
+              value={adminUsername}
+              onChange={(e) => setAdminUsername(e.target.value)}
+              className="form-input"
+              style={{ width: '100%', padding: '12px', marginBottom: '15px', borderRadius: 'var(--border-radius-sm)', border: '1px solid #ccc' }}
+              autoFocus
+            />
+            <input
               type="password"
               placeholder="Enter Master Password"
               value={adminPassword}
               onChange={(e) => setAdminPassword(e.target.value)}
               className="form-input"
               style={{ width: '100%', padding: '12px', marginBottom: '20px', borderRadius: 'var(--border-radius-sm)', border: '1px solid #ccc' }}
-              autoFocus
             />
             <button type="submit" className="btn-primary" style={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}>
               <Lock size={18} /> Unlock Central Command

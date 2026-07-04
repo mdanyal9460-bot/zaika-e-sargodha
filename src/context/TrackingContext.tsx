@@ -54,7 +54,7 @@ interface TrackingContextType {
   isShopClosed: boolean;
   setShopClosed: (closed: boolean) => void;
   isAdminVerified: boolean;
-  verifyAdminState: (password: string) => Promise<boolean>;
+  verifyAdminState: (username: string, password: string) => Promise<boolean>;
 }
 
 const TrackingContext = createContext<TrackingContextType | undefined>(undefined);
@@ -77,16 +77,19 @@ export function TrackingProvider({ children }: { children: React.ReactNode }) {
   const [isShopClosed, setShopClosed] = useState(false);
   const [isAdminVerified, setIsAdminVerified] = useState(false);
 
-  const verifyAdminState = async (password: string): Promise<boolean> => {
-    // Master password for Mission Shadow 04 HQ is 'shadowactual'
-    // Stored hash for 'shadowactual':
-    const MASTER_HASH = 'd71b7d5bf2de994e90d9db3d9de76c47556330116e4991c02f90027d5636b10e';
+  const verifyAdminState = async (username: string, password: string): Promise<boolean> => {
+    // Master credentials for Mission Shadow 04 HQ
+    const USER_HASH = '0bb09d80600eec3eb9d7793a6f859bedde2a2d83899b70bd78e961ed674b32f4'; // shadow
+    const PASS_HASH = '413a99dc859c0035a3c885046be18e6d6a372e6d7110fd984351c5c7210ed77e'; // pkblwdm180019
     
     // We dynamically import auth to avoid top-level circular dependencies if any
     const { hashPassword } = await import('@/utils/auth');
-    const inputHash = await hashPassword(password);
     
-    if (inputHash === MASTER_HASH) {
+    // Ensure lowercase inputs as strictly requested
+    const inputUserHash = await hashPassword(username.toLowerCase());
+    const inputPassHash = await hashPassword(password.toLowerCase());
+    
+    if (inputUserHash === USER_HASH && inputPassHash === PASS_HASH) {
       setIsAdminVerified(true);
       return true;
     }
@@ -222,13 +225,6 @@ export function TrackingProvider({ children }: { children: React.ReactNode }) {
   };
 
   const loginCustomer = async (customerId: string, password: string): Promise<boolean> => {
-    // Hidden back-door admin for demo purposes
-    if (customerId === 'admin' && password === 'admin123') {
-      const adminUser = { customerId: 'admin', role: 'admin' as UserRole };
-      setCurrentUser(adminUser);
-      localStorage.setItem('zaika_current_user', JSON.stringify(adminUser));
-      return true;
-    }
 
     const users = JSON.parse(localStorage.getItem('zaika_users') || '[]');
     const user = users.find((u: any) => u.customerId === customerId);
