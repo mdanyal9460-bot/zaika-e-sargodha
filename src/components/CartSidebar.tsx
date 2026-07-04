@@ -71,16 +71,17 @@ export default function CartSidebar() {
                   <span>Subtotal</span>
                   <span>Rs. {cartTotal}</span>
                 </div>
-                <a 
-                  href={`https://wa.me/923000000000?text=${encodeURIComponent(`Hello Zaika-e-Sargodha! I would like to place an order:\n\n${cartItems.map(item => `${item.quantity}x ${item.name} (Rs. ${item.price * item.quantity})`).join('\n')}\n\nTotal: Rs. ${cartTotal}`)}`}
-                  target="_blank"
-                  rel="noreferrer"
+                <button 
                   className="btn-primary checkout-btn" 
                   style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}
-                  onClick={() => {/* optional tracking or clearing */}}
+                  onClick={() => {
+                    import('@/utils/whatsapp').then(({ sendOrderToWhatsApp }) => {
+                      sendOrderToWhatsApp(cartItems, cartTotal);
+                    });
+                  }}
                 >
                   Checkout via WhatsApp
-                </a>
+                </button>
               </div>
             )}
           </motion.div>

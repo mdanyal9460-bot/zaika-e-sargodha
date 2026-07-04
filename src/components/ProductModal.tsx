@@ -104,9 +104,17 @@ export default function ProductModal({ isOpen, onClose, product }: ProductModalP
                   </button>
                   
                   <div className="external-order-buttons">
-                    <a href={`https://wa.me/923000000000?text=I'd like to order ${product.name}`} target="_blank" rel="noreferrer" className="btn-whatsapp">
+                    <button 
+                      onClick={() => {
+                        import('@/utils/whatsapp').then(({ getWhatsAppLink }) => {
+                          const link = getWhatsAppLink(`I'd like to order ${product.name}`);
+                          window.open(link, '_blank');
+                        });
+                      }}
+                      className="btn-whatsapp"
+                    >
                       <MessageCircle size={18} style={{marginRight: '8px'}}/> Order via WhatsApp
-                    </a>
+                    </button>
                     <button className="btn-foodpanda">
                       Order via FoodPanda
                     </button>
