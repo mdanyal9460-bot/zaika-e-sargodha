@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useTracking, ArchivedOrder, User } from '@/context/TrackingContext';
-import { Shield, TrendingUp, Users, LogOut, Lock, Edit3, Save, Power, Clock } from 'lucide-react';
+import { Shield, TrendingUp, Users, LogOut, Lock, Edit3, Save, Power, Clock, Upload } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { useMenuData } from '@/hooks/useMenuData';
 import { MenuCategory, MenuItem } from '@/types/menu';
@@ -24,7 +24,11 @@ export default function HQDashboard() {
   const { menuData, refetchMenu } = useMenuData();
   const [localMenu, setLocalMenu] = useState<MenuCategory[]>([]);
   const [isSavingMenu, setIsSavingMenu] = useState(false);
+  const [hasChanges, setHasChanges] = useState(false);
   const [timeSlider, setTimeSlider] = useState(0);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploadTarget, setUploadTarget] = useState<{catId: string, itemId: string} | null>(null);
 
   useEffect(() => {
     if (isAdminVerified) {
@@ -55,6 +59,7 @@ export default function HQDashboard() {
   };
 
   const handleMenuChange = (categoryId: string, itemId: string, field: keyof MenuItem, value: string | number | boolean) => {
+    setHasChanges(true);
     setLocalMenu(prev => prev.map(cat => {
       if (cat.categoryId !== categoryId) return cat;
       return {
@@ -67,6 +72,41 @@ export default function HQDashboard() {
     }));
   };
 
+  const triggerImageUpload = (categoryId: string, itemId: string) => {
+    setUploadTarget({ catId: categoryId, itemId: itemId });
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  const onFileSelected = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !uploadTarget) return;
+
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    toast.loading('Uploading image...', { id: 'upload' });
+    try {
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+      const data = await res.json();
+      if (res.ok && data.url) {
+        handleMenuChange(uploadTarget.catId, uploadTarget.itemId, 'image', data.url);
+        toast.success('Image uploaded successfully', { id: 'upload', style: { background: '#1A1A1A', color: '#808080' } });
+      } else {
+        toast.error('Failed to upload image', { id: 'upload' });
+      }
+    } catch (err) {
+      toast.error('Server error during upload', { id: 'upload' });
+    } finally {
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      setUploadTarget(null);
+    }
+  };
+
   const saveMenuToDisk = async () => {
     setIsSavingMenu(true);
     try {
@@ -77,6 +117,7 @@ export default function HQDashboard() {
       });
       if (res.ok) {
         toast.success('Menu updated successfully on server', { style: { background: '#1A1A1A', color: '#808080' }});
+        setHasChanges(false);
         refetchMenu();
       } else {
         toast.error('Failed to update menu');
@@ -102,19 +143,20 @@ export default function HQDashboard() {
     setAdminTimeOffset(val);
   };
 
-  // Shadow Aura Theme Styles
+  // Shiny Dark Glassmorphism Theme Styles
   const theme = {
     bg: '#000000',
-    panelBg: '#1A1A1A',
+    panelBg: 'rgba(26, 26, 26, 0.7)',
     text: '#808080',
     border: '1px solid #333333',
-    inputBg: '#0a0a0a'
+    inputBg: 'rgba(10, 10, 10, 0.8)',
+    boxShadow: '0 0 15px rgba(51, 51, 51, 0.5)'
   };
 
   if (!isAdminVerified) {
     return (
       <div style={{ backgroundColor: theme.bg, color: theme.text, minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ backgroundColor: theme.panelBg, border: theme.border, padding: '40px', maxWidth: '400px', width: '100%', textAlign: 'center', borderRadius: '4px' }}>
+        <div style={{ backgroundColor: theme.panelBg, backdropFilter: 'blur(16px)', border: theme.border, boxShadow: theme.boxShadow, padding: '40px', maxWidth: '400px', width: '100%', textAlign: 'center', borderRadius: '4px' }}>
           <Shield size={64} style={{ color: theme.text, marginBottom: '20px' }} />
           <h2 style={{ fontFamily: 'monospace', color: theme.text, marginBottom: '20px', letterSpacing: '2px' }}>HQ VERIFICATION</h2>
           <form onSubmit={handleAdminVerify} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
@@ -156,6 +198,17 @@ export default function HQDashboard() {
 
   return (
     <div style={{ backgroundColor: theme.bg, color: theme.text, minHeight: '100vh', padding: '60px 20px', fontFamily: 'monospace' }}>
+      <style>{`
+        @keyframes goldPulse {
+          0% { box-shadow: 0 0 5px rgba(212, 175, 55, 0.5); }
+          50% { box-shadow: 0 0 20px rgba(212, 175, 55, 1); }
+          100% { box-shadow: 0 0 5px rgba(212, 175, 55, 0.5); }
+        }
+      `}</style>
+      
+      {/* Hidden File Input for Image Upload */}
+      <input type="file" accept="image/*" ref={fileInputRef} onChange={onFileSelected} style={{ display: 'none' }} />
+
       <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
         
         {/* Header Section */}
@@ -176,7 +229,7 @@ export default function HQDashboard() {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '30px' }}>
           
           {/* Global Control Panel */}
-          <div style={{ backgroundColor: theme.panelBg, border: theme.border, padding: '30px', borderRadius: '4px' }}>
+          <div style={{ backgroundColor: theme.panelBg, backdropFilter: 'blur(16px)', border: theme.border, boxShadow: theme.boxShadow, padding: '30px', borderRadius: '4px' }}>
             <h2 style={{ marginTop: 0, display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px', fontSize: '1.2rem', color: '#fff', textTransform: 'uppercase' }}>
               <Power size={20} /> Mission Control
             </h2>
@@ -220,12 +273,12 @@ export default function HQDashboard() {
           </div>
 
           {/* Dynamic Menu Editor */}
-          <div style={{ backgroundColor: theme.panelBg, border: theme.border, padding: '30px', borderRadius: '4px' }}>
+          <div style={{ backgroundColor: theme.panelBg, backdropFilter: 'blur(16px)', border: theme.border, boxShadow: theme.boxShadow, padding: '30px', borderRadius: '4px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '20px' }}>
               <h2 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '10px', fontSize: '1.2rem', color: '#fff', textTransform: 'uppercase' }}>
                 <Edit3 size={20} /> MASTER MENU EDITOR
               </h2>
-              <button onClick={saveMenuToDisk} disabled={isSavingMenu} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', backgroundColor: theme.text, color: theme.bg, border: 'none', fontWeight: 'bold', cursor: 'pointer' }}>
+              <button onClick={saveMenuToDisk} disabled={isSavingMenu} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', backgroundColor: theme.text, color: theme.bg, border: 'none', fontWeight: 'bold', cursor: 'pointer', animation: hasChanges ? 'goldPulse 2s infinite' : 'none', transition: 'all 0.3s ease' }}>
                 <Save size={16} /> {isSavingMenu ? 'SAVING...' : 'COMMIT TO DISK'}
               </button>
             </div>
@@ -255,12 +308,17 @@ export default function HQDashboard() {
                         />
                       </td>
                       <td style={{ padding: '12px' }}>
-                        <input 
-                          type="text" 
-                          value={item.description || ''} 
-                          onChange={(e) => handleMenuChange(cat.categoryId, item.id, 'description', e.target.value)}
-                          style={{ width: '100%', minWidth: '200px', padding: '6px', backgroundColor: theme.inputBg, color: theme.text, border: theme.border, outline: 'none' }}
-                        />
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <input 
+                            type="text" 
+                            value={item.description || ''} 
+                            onChange={(e) => handleMenuChange(cat.categoryId, item.id, 'description', e.target.value)}
+                            style={{ width: '100%', minWidth: '200px', padding: '6px', backgroundColor: theme.inputBg, color: theme.text, border: theme.border, outline: 'none' }}
+                          />
+                          <button onClick={() => triggerImageUpload(cat.categoryId, item.id)} title="Upload Image" style={{ background: 'none', border: 'none', cursor: 'pointer', color: theme.text, padding: '4px' }}>
+                            <Upload size={18} />
+                          </button>
+                        </div>
                       </td>
                       <td style={{ padding: '12px' }}>
                         <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', gap: '8px' }}>
@@ -285,7 +343,7 @@ export default function HQDashboard() {
           {/* LTV & Global Ledger Components */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '30px' }}>
             {/* LTV Matrix */}
-            <div style={{ backgroundColor: theme.panelBg, border: theme.border, padding: '30px', borderRadius: '4px' }}>
+            <div style={{ backgroundColor: theme.panelBg, backdropFilter: 'blur(16px)', border: theme.border, boxShadow: theme.boxShadow, padding: '30px', borderRadius: '4px' }}>
               <h2 style={{ marginTop: 0, display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px', fontSize: '1.2rem', color: '#fff', textTransform: 'uppercase' }}>
                 <Users size={20} /> LTV MATRIX
               </h2>
@@ -312,7 +370,7 @@ export default function HQDashboard() {
             </div>
 
             {/* Ledger */}
-            <div style={{ backgroundColor: theme.panelBg, border: theme.border, padding: '30px', borderRadius: '4px' }}>
+            <div style={{ backgroundColor: theme.panelBg, backdropFilter: 'blur(16px)', border: theme.border, boxShadow: theme.boxShadow, padding: '30px', borderRadius: '4px' }}>
               <h2 style={{ marginTop: 0, display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px', fontSize: '1.2rem', color: '#fff', textTransform: 'uppercase' }}>
                 <TrendingUp size={20} /> GLOBAL ORDER LEDGER
               </h2>
