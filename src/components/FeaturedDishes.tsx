@@ -8,14 +8,18 @@ import { menuData } from '@/data/menuData';
 export default function FeaturedDishes() {
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
 
-  const mainCourseCategory = menuData.find(cat => cat.categoryId === 'main-course');
-  const featuredDishes = mainCourseCategory 
-    ? [
-        mainCourseCategory.items.find(i => i.id === 'mc-3'), // Biryani
-        mainCourseCategory.items.find(i => i.id === 'mc-13'), // Karahi
-        mainCourseCategory.items.find(i => i.id === 'mc-4')  // Economy Deal
-      ].filter(Boolean) as any[]
-    : [];
+  // Flatten all items for easy searching
+  const allItems = menuData.flatMap(category => category.items);
+  
+  // Extract the exact 6 premium items requested by Alpha
+  const featuredDishes = [
+    allItems.find(i => i.id === 'mc-3'),  // Shahi Hyderabadi Biryani
+    allItems.find(i => i.id === 'mc-9'),  // Chicken Karahi
+    allItems.find(i => i.id === 'des-1'), // Special Sugi ka halwa
+    allItems.find(i => i.id === 'mc-7'),  // Beef Korma
+    allItems.find(i => i.id === 'mc-1'),  // Homestyle Bhindi Chicken
+    allItems.find(i => i.id === 'dl-1')   // Deal 1
+  ].filter(Boolean) as any[];
 
   return (
     <>

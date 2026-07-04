@@ -1,6 +1,7 @@
 "use client";
 
 import React from 'react';
+import Image from 'next/image';
 import { menuData } from '@/data/menuData';
 import { useCart } from '@/context/CartContext';
 import { toast } from 'react-hot-toast';
@@ -14,7 +15,7 @@ export default function Menu() {
       id: item.id,
       name: item.name,
       price: item.price,
-      image: '/hero.png', // Using a placeholder since we don't have individual images yet
+      image: item.image || '/hero.png',
       quantity: 1
     });
 
@@ -56,13 +57,16 @@ export default function Menu() {
             </h3>
             
             <div className="grid-3">
-              {category.items.map((item) => (
+              {category.items.map((item, idx) => (
                 <div key={item.id} className="card" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
                   <div style={{ position: 'relative', width: '100%', height: '200px' }}>
-                    <img 
+                    <Image 
                       src={item.image || '/hero.png'} 
                       alt={item.name} 
-                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      priority={idx < 3} /* Priority for top row items */
+                      style={{ objectFit: 'cover' }}
                     />
                   </div>
                   <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', flexGrow: 1, justifyContent: 'space-between' }}>
@@ -84,7 +88,7 @@ export default function Menu() {
                         justifyContent: 'center',
                         gap: '8px',
                         fontSize: '1rem',
-                        minHeight: '48px',
+                        minHeight: '54px', /* Ensuring touch target meets guidelines */
                         marginTop: 'auto'
                       }}
                     >

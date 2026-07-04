@@ -21,11 +21,14 @@ export default function Gallery() {
 
       <div className="masonry-grid">
         {images.map((img, idx) => (
-          <div className="masonry-item" key={idx}>
-            {/* Standard img tag is often easier for masonry layouts since heights vary naturally */}
-            <img 
+          <div className="masonry-item" key={idx} style={{ position: 'relative', width: '100%', minHeight: '250px' }}>
+            <Image 
               src={img.src} 
               alt={img.alt} 
+              fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              priority={idx === 0}
+              style={{ objectFit: 'cover' }}
             />
           </div>
         ))}

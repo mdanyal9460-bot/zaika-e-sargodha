@@ -478,9 +478,9 @@ p {
   .masonry-grid { column-count: 1; }
   
   :root {
-    --spacing-section: 100px;
-    --spacing-container: 40px;
-    --spacing-grid-gap: 40px;
+    --spacing-section: 80px;
+    --spacing-container: 20px;
+    --spacing-grid-gap: 60px; /* Increased for mobile vertical padding */
   }
   h1 { font-size: 2.5rem; }
   h2 { font-size: 2rem; }
