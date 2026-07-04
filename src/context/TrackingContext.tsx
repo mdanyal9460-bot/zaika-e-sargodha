@@ -15,9 +15,12 @@ interface TrackingContextType {
   activeOrder: TrackedOrder | null;
   currentStatus: OrderStatus;
   isTrackerOpen: boolean;
+  timeOffsetMinutes: number;
+  estimatedRemainingMinutes: number;
   startTracking: (items: any[], total: number) => void;
   toggleTracker: () => void;
   clearTracking: () => void;
+  setAdminTimeOffset: (minutes: number) => void;
 }
 
 const TrackingContext = createContext<TrackingContextType | undefined>(undefined);
@@ -33,6 +36,8 @@ export function TrackingProvider({ children }: { children: React.ReactNode }) {
   const [activeOrder, setActiveOrder] = useState<TrackedOrder | null>(null);
   const [currentStatus, setCurrentStatus] = useState<OrderStatus>('Pending');
   const [isTrackerOpen, setIsTrackerOpen] = useState(false);
+  const [timeOffsetMinutes, setTimeOffsetMinutes] = useState(0);
+  const [estimatedRemainingMinutes, setEstimatedRemainingMinutes] = useState(TRACKING_CONFIG.MINUTES_DELIVERED);
 
   // Load from local storage on mount
   useEffect(() => {
@@ -42,18 +47,22 @@ export function TrackingProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  // Update status based on elapsed time
+  // Update status based on elapsed time and admin offset
   useEffect(() => {
     if (!activeOrder) return;
 
     const calculateStatus = () => {
-      const elapsedMinutes = (Date.now() - activeOrder.placedAt) / 1000 / 60;
+      const realElapsedMinutes = (Date.now() - activeOrder.placedAt) / 1000 / 60;
+      const effectiveElapsedMinutes = realElapsedMinutes + timeOffsetMinutes;
       
-      if (elapsedMinutes < TRACKING_CONFIG.MINUTES_IN_KITCHEN) {
+      const remaining = Math.max(0, Math.ceil(TRACKING_CONFIG.MINUTES_DELIVERED - effectiveElapsedMinutes));
+      setEstimatedRemainingMinutes(remaining);
+      
+      if (effectiveElapsedMinutes < TRACKING_CONFIG.MINUTES_IN_KITCHEN) {
         setCurrentStatus('Pending');
-      } else if (elapsedMinutes < TRACKING_CONFIG.MINUTES_OUT_FOR_DELIVERY) {
+      } else if (effectiveElapsedMinutes < TRACKING_CONFIG.MINUTES_OUT_FOR_DELIVERY) {
         setCurrentStatus('In Kitchen');
-      } else if (elapsedMinutes < TRACKING_CONFIG.MINUTES_DELIVERED) {
+      } else if (effectiveElapsedMinutes < TRACKING_CONFIG.MINUTES_DELIVERED) {
         setCurrentStatus('Out for Delivery');
       } else {
         setCurrentStatus('Delivered');
@@ -65,7 +74,7 @@ export function TrackingProvider({ children }: { children: React.ReactNode }) {
     const interval = setInterval(calculateStatus, 60000);
     
     return () => clearInterval(interval);
-  }, [activeOrder]);
+  }, [activeOrder, timeOffsetMinutes]);
 
   const startTracking = (items: any[], total: number) => {
     const newOrder: TrackedOrder = {
@@ -76,6 +85,7 @@ export function TrackingProvider({ children }: { children: React.ReactNode }) {
     };
     setActiveOrder(newOrder);
     setCurrentStatus('Pending');
+    setTimeOffsetMinutes(0);
     localStorage.setItem('zaika_active_order', JSON.stringify(newOrder));
     setIsTrackerOpen(true);
   };
@@ -86,10 +96,25 @@ export function TrackingProvider({ children }: { children: React.ReactNode }) {
     setActiveOrder(null);
     localStorage.removeItem('zaika_active_order');
     setIsTrackerOpen(false);
+    setTimeOffsetMinutes(0);
+  };
+  
+  const setAdminTimeOffset = (minutes: number) => {
+    setTimeOffsetMinutes(minutes);
   };
 
   return (
-    <TrackingContext.Provider value={{ activeOrder, currentStatus, isTrackerOpen, startTracking, toggleTracker, clearTracking }}>
+    <TrackingContext.Provider value={{ 
+      activeOrder, 
+      currentStatus, 
+      isTrackerOpen, 
+      timeOffsetMinutes,
+      estimatedRemainingMinutes,
+      startTracking, 
+      toggleTracker, 
+      clearTracking,
+      setAdminTimeOffset
+    }}>
       {children}
     </TrackingContext.Provider>
   );

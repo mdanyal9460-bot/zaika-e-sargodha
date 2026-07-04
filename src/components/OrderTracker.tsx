@@ -13,7 +13,16 @@ const STATUS_STAGES = [
 ];
 
 export default function OrderTracker() {
-  const { isTrackerOpen, toggleTracker, activeOrder, currentStatus, clearTracking } = useTracking();
+  const { 
+    isTrackerOpen, 
+    toggleTracker, 
+    activeOrder, 
+    currentStatus, 
+    clearTracking,
+    timeOffsetMinutes,
+    estimatedRemainingMinutes,
+    setAdminTimeOffset
+  } = useTracking();
 
   const getCurrentStageIndex = () => {
     return STATUS_STAGES.findIndex(stage => stage.status === currentStatus);
@@ -63,7 +72,7 @@ export default function OrderTracker() {
                   <div style={{ fontSize: '1.2rem', fontWeight: 'bold', color: 'var(--color-primary)' }}>Total: Rs. {activeOrder.total}</div>
                 </div>
 
-                {/* Vertical Progress Tracker */}
+        {/* Vertical Progress Tracker */}
                 <div style={{ position: 'relative', paddingLeft: '20px', display: 'flex', flexDirection: 'column', gap: '40px' }}>
                   {/* Connecting Line */}
                   <div style={{ 
@@ -125,15 +134,77 @@ export default function OrderTracker() {
                   })}
                 </div>
                 
+                {/* Estimated Time Display */}
+                {currentStatus !== 'Delivered' && (
+                  <div style={{ marginTop: '30px', textAlign: 'center', padding: '16px', background: 'rgba(128, 0, 0, 0.05)', borderRadius: 'var(--border-radius-lg)' }}>
+                    <div style={{ fontSize: '0.9rem', color: '#666' }}>Estimated Delivery In</div>
+                    <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: 'var(--color-primary)' }}>
+                      {estimatedRemainingMinutes} Minutes
+                    </div>
+                  </div>
+                )}
+
+                {/* Cancel Order Logic */}
+                {currentStatus !== 'Delivered' && (
+                  <div style={{ marginTop: '20px' }}>
+                    <button
+                      onClick={() => {
+                        const reason = window.prompt("Please enter a reason for cancellation:");
+                        if (reason !== null) {
+                          import('react-hot-toast').then(({ toast }) => {
+                            toast.error(`Order Cancelled. Dashboard Notified: ${reason || 'No reason provided'}`);
+                          });
+                          clearTracking();
+                        }
+                      }}
+                      disabled={currentStatus === 'Out for Delivery'}
+                      className="btn-secondary"
+                      style={{ 
+                        width: '100%', 
+                        opacity: currentStatus === 'Out for Delivery' ? 0.5 : 1,
+                        cursor: currentStatus === 'Out for Delivery' ? 'not-allowed' : 'pointer',
+                        background: 'transparent',
+                        borderColor: '#ccc',
+                        color: currentStatus === 'Out for Delivery' ? '#999' : 'red'
+                      }}
+                    >
+                      {currentStatus === 'Out for Delivery' ? 'Too Late to Cancel' : 'Cancel Order'}
+                    </button>
+                  </div>
+                )}
+
                 {currentStatus === 'Delivered' && (
                   <button 
                     onClick={clearTracking}
                     className="btn-secondary"
-                    style={{ width: '100%', marginTop: '40px' }}
+                    style={{ width: '100%', marginTop: '30px' }}
                   >
                     Clear Order History
                   </button>
                 )}
+
+                {/* Admin Controls for Time Simulation */}
+                <div style={{ marginTop: '40px', paddingTop: '20px', borderTop: '1px solid #e0e0e0' }}>
+                  <div style={{ fontSize: '0.85rem', fontWeight: 'bold', color: '#333', marginBottom: '8px' }}>
+                    Admin Control (Time Adjustment)
+                  </div>
+                  <div style={{ fontSize: '0.75rem', color: '#666', marginBottom: '12px' }}>
+                    Simulate time passing (Offset: {timeOffsetMinutes} mins)
+                  </div>
+                  <input 
+                    type="range" 
+                    min="-10" 
+                    max="60" 
+                    step="5"
+                    value={timeOffsetMinutes}
+                    onChange={(e) => setAdminTimeOffset(Number(e.target.value))}
+                    style={{ width: '100%' }}
+                  />
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: '#999', marginTop: '4px' }}>
+                    <span>Delay (-10m)</span>
+                    <span>Speed Up (+60m)</span>
+                  </div>
+                </div>
               </div>
             )}
           </motion.div>
