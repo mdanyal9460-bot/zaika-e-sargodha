@@ -44,9 +44,10 @@ export default function HQDashboard() {
 
   if (!currentUser || currentUser.role !== 'admin') return null;
 
-  const handleAdminVerify = (e: React.FormEvent) => {
+  const handleAdminVerify = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (verifyAdminState(adminPassword)) {
+    const isValid = await verifyAdminState(adminPassword);
+    if (isValid) {
       toast.success('Access Granted: Welcome to Mission Shadow 04 HQ');
     } else {
       toast.error('Access Denied: Invalid Master Password');

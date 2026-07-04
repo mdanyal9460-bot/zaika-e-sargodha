@@ -54,7 +54,7 @@ interface TrackingContextType {
   isShopClosed: boolean;
   setShopClosed: (closed: boolean) => void;
   isAdminVerified: boolean;
-  verifyAdminState: (password: string) => boolean;
+  verifyAdminState: (password: string) => Promise<boolean>;
 }
 
 const TrackingContext = createContext<TrackingContextType | undefined>(undefined);
@@ -77,9 +77,16 @@ export function TrackingProvider({ children }: { children: React.ReactNode }) {
   const [isShopClosed, setShopClosed] = useState(false);
   const [isAdminVerified, setIsAdminVerified] = useState(false);
 
-  const verifyAdminState = (password: string): boolean => {
-    // Master password for Mission Shadow 04 HQ
-    if (password === 'shadowactual') {
+  const verifyAdminState = async (password: string): Promise<boolean> => {
+    // Master password for Mission Shadow 04 HQ is 'shadowactual'
+    // Stored hash for 'shadowactual':
+    const MASTER_HASH = 'd71b7d5bf2de994e90d9db3d9de76c47556330116e4991c02f90027d5636b10e';
+    
+    // We dynamically import auth to avoid top-level circular dependencies if any
+    const { hashPassword } = await import('@/utils/auth');
+    const inputHash = await hashPassword(password);
+    
+    if (inputHash === MASTER_HASH) {
       setIsAdminVerified(true);
       return true;
     }
