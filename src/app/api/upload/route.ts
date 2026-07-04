@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
+import { put } from '@vercel/blob';
 
 export async function POST(request: Request) {
   try {
@@ -11,27 +10,18 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'No file received.' }, { status: 400 });
     }
 
-    const buffer = Buffer.from(await file.arrayBuffer());
-    // Safe filename parsing to remove spaces and special characters
+    // Safe filename parsing
     const filename = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
     
-    // We are simulating an S3 upload by putting it directly in public/images
-    const uploadDir = path.join(process.cwd(), 'public', 'images');
+    // Upload directly to Vercel Blob
+    const blob = await put(`dish-images/${filename}`, file, {
+      access: 'public',
+    });
     
-    // Ensure the directory exists
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
-    
-    const filePath = path.join(uploadDir, filename);
-    fs.writeFileSync(filePath, buffer);
-    
-    // Return the relative URL that can be used on the frontend
-    const url = `/images/${filename}`;
-    
-    return NextResponse.json({ success: true, url });
+    // Return the absolute public URL from Vercel Blob
+    return NextResponse.json({ success: true, url: blob.url });
   } catch (error) {
-    console.error('Error during file upload:', error);
-    return NextResponse.json({ error: 'Upload failed.' }, { status: 500 });
+    console.error('Error during Vercel Blob upload:', error);
+    return NextResponse.json({ error: 'Upload to Vercel Blob failed.' }, { status: 500 });
   }
 }
