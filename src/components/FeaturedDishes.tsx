@@ -3,33 +3,19 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import ProductModal from '@/components/ProductModal';
+import { menuData } from '@/data/menuData';
 
 export default function FeaturedDishes() {
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
 
-  const featuredDishes = [
-    {
-      id: 1,
-      name: "Chicken Biryani",
-      price: "Rs. 450",
-      image: "/biryani.png",
-      description: "Aromatic basmati rice cooked with tender chicken pieces, blended with our secret spices and served with fresh raita."
-    },
-    {
-      id: 2,
-      name: "Chicken Karahi",
-      price: "Rs. 850",
-      image: "/karahi.png",
-      description: "Classic street-style chicken karahi cooked in tomatoes, green chilies, and fresh ginger for that authentic dhaba taste."
-    },
-    {
-      id: 3,
-      name: "Chicken Pulao",
-      price: "Rs. 400",
-      image: "/biryani.png",
-      description: "Delicately spiced chicken pulao made with rich broth and premium long-grain rice. Comfort food at its finest."
-    }
-  ];
+  const mainCourseCategory = menuData.find(cat => cat.categoryId === 'main-course');
+  const featuredDishes = mainCourseCategory 
+    ? [
+        mainCourseCategory.items.find(i => i.id === 'mc-3'), // Biryani
+        mainCourseCategory.items.find(i => i.id === 'mc-13'), // Karahi
+        mainCourseCategory.items.find(i => i.id === 'mc-4')  // Economy Deal
+      ].filter(Boolean) as any[]
+    : [];
 
   return (
     <>

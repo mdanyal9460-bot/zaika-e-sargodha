@@ -57,30 +57,40 @@ export default function Menu() {
             
             <div className="grid-3">
               {category.items.map((item) => (
-                <div key={item.id} className="card" style={{ padding: '24px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: '180px' }}>
-                  <div>
-                    <h4 style={{ fontSize: '1.25rem', marginBottom: '8px', color: 'var(--color-text)' }}>{item.name}</h4>
-                    <div style={{ color: '#B8860B', fontWeight: '700', fontSize: '1.2rem', marginBottom: '16px' }}>
-                      Rs. {item.price}
-                    </div>
+                <div key={item.id} className="card" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                  <div style={{ position: 'relative', width: '100%', height: '200px' }}>
+                    <img 
+                      src={item.image || '/hero.png'} 
+                      alt={item.name} 
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
                   </div>
-                  
-                  <button 
-                    onClick={() => handleAddToOrder(item)}
-                    className="btn-primary"
-                    style={{ 
-                      width: '100%', 
-                      padding: '12px 20px', 
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      justifyContent: 'center',
-                      gap: '8px',
-                      fontSize: '1rem',
-                      minHeight: '48px'
-                    }}
-                  >
-                    <Plus size={18} /> Add to Order
-                  </button>
+                  <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', flexGrow: 1, justifyContent: 'space-between' }}>
+                    <div>
+                      <h4 style={{ fontSize: '1.25rem', marginBottom: '8px', color: 'var(--color-text)' }}>{item.name}</h4>
+                      <div style={{ color: '#B8860B', fontWeight: '700', fontSize: '1.2rem', marginBottom: '16px' }}>
+                        Rs. {item.price}
+                      </div>
+                    </div>
+                    
+                    <button 
+                      onClick={() => handleAddToOrder(item)}
+                      className="btn-primary"
+                      style={{ 
+                        width: '100%', 
+                        padding: '12px 20px', 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        justifyContent: 'center',
+                        gap: '8px',
+                        fontSize: '1rem',
+                        minHeight: '48px',
+                        marginTop: 'auto'
+                      }}
+                    >
+                      <Plus size={18} /> Add to Order
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
